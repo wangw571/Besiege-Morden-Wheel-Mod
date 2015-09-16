@@ -18,9 +18,9 @@
                 .TextureFile("whell_map.png")
                 .BlockName("Morden Wheel")
                 .Obj(new List<Obj> { new Obj("wheel.obj", new VisualOffset(Vector3.one, Vector3.zero, Vector3.zero)) })//
-                .Scripts(new Type[] { typeof(wheelMod) })
+                .Scripts(new Type[] { typeof(wheelModS) })
                 .Properties(new BlockProperties()//.Slider("Speed", 0f, 5f, 1f).Key1("Forward", "8").Key2("backward", "2")*/
-                                                 .ToggleModeEnabled("Freeze me", false)
+                                                 /*.ToggleModeEnabled("Freeze me", false)*/
                                                  .CanBeDamaged(3)
                                                  )
                 .Mass(3f)
@@ -46,7 +46,7 @@
         }
 
 
-        public class wheelMod : BlockScript
+        public class wheelModS : BlockScript
         {
         public Vector3 Torque;
         public Collider coll;
@@ -54,14 +54,16 @@
         public float diffy;
         public float diffz;
         public float sv;*/
-        protected override void OnSimulateStart(){
-            //Still not seems working :/ maybe I need to use meshCollider?
-            Collider col = this.GetComponentInChildren<Collider>();
-            col.material.bounciness = 1;
-            col.material.dynamicFriction = 0;
-            col.material.staticFriction = 0;
-            col.material.bounceCombine = PhysicMaterialCombine.Maximum;
-            col.material.frictionCombine = PhysicMaterialCombine.Minimum;
+        protected override void OnSimulateStart() {
+            //Thank ITR for those bounciness and friction!
+            Collider[] allColliders = this.GetComponentsInChildren<Collider>();
+            foreach (Collider col in allColliders){
+                col.material.bounciness = 0.5f;
+                col.material.dynamicFriction = 1;
+                col.material.staticFriction = 1;
+                col.material.bounceCombine = PhysicMaterialCombine.Maximum;
+                col.material.frictionCombine = PhysicMaterialCombine.Minimum;
+            }
             /*sv = 30*this.GetComponent<MyBlockInfo>().sliderValue;*/
         }
             
@@ -75,6 +77,7 @@
         {
             if (AddPiece.isSimulating)
             {
+                
                 /*diffz = Vector3.Angle(transform.forward, Vector3.forward);
                 diffx = Vector3.Angle(transform.up, Vector3.up);
                 diffy = Vector3.Angle(transform.right, Vector3.right);
